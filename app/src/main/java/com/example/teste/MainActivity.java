@@ -41,7 +41,7 @@ public class MainActivity extends AppCompatActivity {
 
     private LoginButton loginButton;
     private CircleImageView circleImageView;
-    private TextView txtName,txtEmail;
+    private TextView txtName, txtEmail;
 
     String nome, email, tel;
     private EditText nameInput;
@@ -76,14 +76,13 @@ public class MainActivity extends AppCompatActivity {
         //--------------------------------------------//
 
         callbackManager = CallbackManager.Factory.create();
-        loginButton.setReadPermissions(Arrays.asList("email","public_profile"));
+        loginButton.setReadPermissions(Arrays.asList("email", "public_profile"));
         checkLoginStatus();
 
         loginButton.registerCallback(callbackManager, new FacebookCallback<LoginResult>() {
             @Override
-            public void onSuccess(LoginResult loginResult)
-            {
-                Toast.makeText(getApplicationContext(),"Login realizado",Toast.LENGTH_SHORT).show();
+            public void onSuccess(LoginResult loginResult) {
+                Toast.makeText(getApplicationContext(), "Login realizado", Toast.LENGTH_SHORT).show();
                 Intent intent = new Intent(getApplicationContext(), MainActivity.class);
                 startActivity(intent);
 
@@ -91,7 +90,7 @@ public class MainActivity extends AppCompatActivity {
 
             @Override
             public void onCancel() {
-                Toast.makeText(getApplicationContext(),"Login cancelado",Toast.LENGTH_SHORT).show();
+                Toast.makeText(getApplicationContext(), "Login cancelado", Toast.LENGTH_SHORT).show();
                 AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
                 builder.setMessage("Login Cancelado!")
                         .setPositiveButton("OK", null);
@@ -102,7 +101,7 @@ public class MainActivity extends AppCompatActivity {
 
             @Override
             public void onError(FacebookException error) {
-                Toast.makeText(getApplicationContext(),"Erro ao fazer login",Toast.LENGTH_SHORT).show();
+                Toast.makeText(getApplicationContext(), "Erro ao fazer login", Toast.LENGTH_SHORT).show();
                 AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
                 builder.setMessage("Erro ao fazer o login!")
                         .setPositiveButton("OK", null);
@@ -113,7 +112,7 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
-//==============================Primeira Parte do Trabalho==================================================================
+    //==============================Primeira Parte do Trabalho==================================================================
     private void submitButtonControl() {
         submitButton = (Button) findViewById(R.id.submitButton);
         submitButton.setOnClickListener(new View.OnClickListener() {
@@ -148,7 +147,7 @@ public class MainActivity extends AppCompatActivity {
     /**
      * Abre o app Contacts e preenche o formulario para adicionar contato
      */
-    private void addContact(){
+    private void addContact() {
         final Intent intent = new Intent(ContactsContract.Intents.Insert.ACTION);
         intent.setType(ContactsContract.RawContacts.CONTENT_TYPE);
 
@@ -168,30 +167,32 @@ public class MainActivity extends AppCompatActivity {
 
     /**
      * Abre Whatsapp no telefone digitado com mensagem para o contato adicionado
+     *
      * @param telNumber
      */
-    private void sendWhatsApp(String telNumber){
+    private void sendWhatsApp(String telNumber) {
         PackageManager packageManager = this.getPackageManager();
         Intent i = new Intent(Intent.ACTION_VIEW);
         String phone = "55" + telNumber;
 
         try {
-            String url = "https://api.whatsapp.com/send?phone="+ phone +"&text=" + URLEncoder.encode("Cadastro realizado.", "UTF-8");
+            String url = "https://api.whatsapp.com/send?phone=" + phone + "&text=" + URLEncoder.encode("Cadastro realizado.", "UTF-8");
             i.setPackage("com.whatsapp");
             i.setData(Uri.parse(url));
 
             if (i.resolveActivity(packageManager) != null) {
                 this.startActivity(i);
             } else {
-                Toast.makeText(this.getApplicationContext(),"Mensagem nao enviada",Toast.LENGTH_SHORT).show();
+                Toast.makeText(this.getApplicationContext(), "Mensagem nao enviada", Toast.LENGTH_SHORT).show();
             }
-        } catch (Exception e){
+        } catch (Exception e) {
             e.printStackTrace();
         }
     }
 
     /**
      * Preenche automaticamente um email de confirmacao para o contato adicionado
+     *
      * @param emails
      */
     private void sendEmail(String emails) {
@@ -214,41 +215,36 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
-        callbackManager.onActivityResult(requestCode,resultCode,data);
+        callbackManager.onActivityResult(requestCode, resultCode, data);
         super.onActivityResult(requestCode, resultCode, data);
     }
 
     AccessTokenTracker tokenTracker = new AccessTokenTracker() {
         @Override
-        protected void onCurrentAccessTokenChanged(AccessToken oldAccessToken, AccessToken currentAccessToken)
-        {
-            if(currentAccessToken==null)
-            {
+        protected void onCurrentAccessTokenChanged(AccessToken oldAccessToken, AccessToken currentAccessToken) {
+            if (currentAccessToken == null) {
                 txtName.setText("");
                 txtEmail.setText("");
                 circleImageView.setImageResource(0);
-                Toast.makeText(MainActivity.this,"User Logged out",Toast.LENGTH_LONG).show();
-            }
-            else
+                Toast.makeText(MainActivity.this, "User Logged out", Toast.LENGTH_LONG).show();
+            } else
                 loadUserProfile(currentAccessToken);
         }
     };
 
-    private void loadUserProfile(AccessToken newAccessToken)
-    {
+    private void loadUserProfile(AccessToken newAccessToken) {
         GraphRequest request = GraphRequest.newMeRequest(newAccessToken, new GraphRequest.GraphJSONObjectCallback() {
             @Override
-            public void onCompleted(JSONObject object, GraphResponse response)
-            {
+            public void onCompleted(JSONObject object, GraphResponse response) {
                 try {
                     String first_name = object.getString("first_name");
                     String last_name = object.getString("last_name");
                     String email = object.getString("email");
                     String id = object.getString("id");
-                    String image_url = "https://graph.facebook.com/"+id+ "/picture?type=normal";
+                    String image_url = "https://graph.facebook.com/" + id + "/picture?type=normal";
 
                     txtEmail.setText(email);
-                    txtName.setText(first_name +" "+last_name);
+                    txtName.setText(first_name + " " + last_name);
                     RequestOptions requestOptions = new RequestOptions();
                     requestOptions.dontAnimate();
 
@@ -263,16 +259,14 @@ public class MainActivity extends AppCompatActivity {
         });
 
         Bundle parameters = new Bundle();
-        parameters.putString("fields","first_name,last_name,email,id");
+        parameters.putString("fields", "first_name,last_name,email,id");
         request.setParameters(parameters);
         request.executeAsync();
 
     }
 
-    private void checkLoginStatus()
-    {
-        if(AccessToken.getCurrentAccessToken()!=null)
-        {
+    private void checkLoginStatus() {
+        if (AccessToken.getCurrentAccessToken() != null) {
             loadUserProfile(AccessToken.getCurrentAccessToken());
         }
     }
