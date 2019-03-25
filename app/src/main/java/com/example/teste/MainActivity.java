@@ -17,8 +17,6 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 
-//testando como fazer commit quando altero o arquivoo
-
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.RequestOptions;
 import com.facebook.AccessToken;
